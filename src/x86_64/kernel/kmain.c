@@ -10,6 +10,7 @@ char* vga_main = (char*)0xB8000;
 #include "interrupts/interrupt_handlers.h"
 #include "interrupts/syscalls/syscalls.h"
 #include "memory/GDT.h"
+#include "drivers/PCI_IDE_ATA.h"
 
 #define SW 80
 
