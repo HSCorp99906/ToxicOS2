@@ -2,6 +2,7 @@ all:
 	nasm -felf32 src/x86_64/kernel/memory/GDT.S -o obj/asmgdt.o
 	nasm -felf32 src/x86_64/kernel/interrupts/syscalls/syscall_dispatcher.S -o obj/sysc_disp.o
 	nasm -felf32 src/x86_64/applications/kernelspace/keybindHandler/kbutils.S -o obj/kbutils.o
+	nasm -felf32 src/x86_64/kernel/cpu/longMode.S -o obj/lm.o
 	gcc -c -m32 src/x86_64/kernel/kmain.c -mgeneral-regs-only -ffreestanding -fno-pie -fstack-protector -o obj/kmain.o
 	gcc -c -m32 src/x86_64/applications/kernelspace/keybindHandler/main.c  -ffreestanding -fno-pie -fstack-protector -o obj/startupShell.o
 	gcc -c -m32 src/x86_64/kernel/drivers/impl/IO.c -ffreestanding -fno-pie -fstack-protector -o obj/io.o

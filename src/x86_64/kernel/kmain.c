@@ -27,8 +27,20 @@ static void kb_isr_stub() {
     outportb(0x20, 0x20);
 }
 
-void _syscall_dispatcher();
 
+static void panic(const char* reason) {
+     outportb(0x3D4, 0x0A);
+	 outportb(0x3D5, 0x20);
+     vga_clear(&vga_main, 0x4, 0xF);
+     vga_puts("**** KERNEL PANIC ****", &vga_main, 1);
+     vga_puts("", &vga_main, 1);
+     vga_puts(reason, &vga_main, 1);
+     __asm__ __volatile__("cli; hlt");
+}
+
+
+unsigned char _lm_support_chk();
+void _syscall_dispatcher();
 int _ssmain();
 
 int _start() {   
@@ -56,6 +68,10 @@ int _start() {
 
     vga_main += 120;
     */
+
+    if (!(_lm_support_chk())) {
+        panic("LONG MODE NOT SUPPORTED.");
+    }
 
     _ssmain();      // Run the kernel space startup shell.
 
