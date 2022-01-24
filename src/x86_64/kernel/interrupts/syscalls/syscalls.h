@@ -1,7 +1,7 @@
 #ifndef SYSCALLS_H
 #define SYSCALLS_H
 
-#define MAX_SYSCALLS 10
+#define MAX_SYSCALLS 11
 
 #include "../../drivers/IO.h"
 #include "../../drivers/VGA.h"
@@ -53,6 +53,11 @@ void reset_vga() {
     vga_clear(&vga_main, 0x1, 0xE);
     __asm__ __volatile__("mov $0x1, %ecx; mov $0x9, %eax; int $0x80");
     update_cursor(20, 0);
+}
+
+void clear_screen() {
+    vga_clear(&vga_main, 0x1, 0xE);
+    update_cursor(0, 0);
 }
 
 void syscall_update_menuentry() {
@@ -111,6 +116,7 @@ void* syscalls[MAX_SYSCALLS] = {
     display_disks,
     vga_clear_color,
     syscall_update_menuentry,
+    clear_screen,
 };
 
 #endif

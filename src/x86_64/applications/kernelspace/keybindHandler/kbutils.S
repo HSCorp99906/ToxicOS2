@@ -6,6 +6,7 @@ global color_change
 global kprint
 global update_entry
 global _curs_move
+global _clear_screen
 
 destub_kb_isr:
     mov eax, 0x1
@@ -57,5 +58,10 @@ _curs_move:
     mov eax, 0x2
     mov ecx, [esp + 4]
     mov ebx, [esp + 8]
+    int 0x80
+    ret
+
+_clear_screen:
+    mov eax, 0xA
     int 0x80
     ret
