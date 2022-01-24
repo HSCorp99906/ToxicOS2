@@ -8,10 +8,12 @@ char* vga_main = (char*)0xB8000;
 #include "drivers/floppy.h"
 #include "drivers/PCI_IDE_ATA.h"
 #include "drivers/graphics.h"
+#include "drivers/mouse.h"
 #include "interrupts/IDT.h"
 #include "interrupts/interrupt_handlers.h"
 #include "interrupts/syscalls/syscalls.h"
 #include "memory/GDT.h"
+
 
 #define SW 80
 
@@ -35,8 +37,9 @@ int _start() {
  
     set_idt_desc32(0x0, div_by_0_handler, TRAP_GATE_FLAGS);
     set_idt_desc32(0x21, kb_isr_stub, INT_GATE_FLAGS);
-    set_idt_desc32(0x80, _syscall_dispatcher, INT_GATE_FLAGS);  
+    set_idt_desc32(0x80, _syscall_dispatcher, INT_GATE_FLAGS);
     unmask_kb_irq();
+
     __asm__ __volatile__("sti"); 
  
     vga_clear(&vga_main, 0x1, 0xE);
