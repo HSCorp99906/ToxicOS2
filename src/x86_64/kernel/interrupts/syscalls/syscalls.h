@@ -1,7 +1,7 @@
 #ifndef SYSCALLS_H
 #define SYSCALLS_H
 
-#define MAX_SYSCALLS 9
+#define MAX_SYSCALLS 10
 
 #include "../../drivers/IO.h"
 #include "../../drivers/VGA.h"
@@ -50,9 +50,30 @@ void syscall_popc() {
 
 
 void reset_vga() {
-    vga_clear(&vga_main, 0x1, 0xE);
-    vga_puts("Kernel Initialized.", &vga_main, 1);
-    vga_puts("", &vga_main, 1);
+    vga_clear(&vga_main, 0x1, 0xE); 
+}
+
+void syscall_update_menuentry() {
+    register unsigned int num asm("ecx");
+
+    switch (num) {
+        case 1:
+            drw_4_entry_menu("Credits", "UNUSED", "UNUSED", 
+            "UNUSED", MENU_ENTRY_1);
+            break;
+        case 2:
+            drw_4_entry_menu("Credits", "UNUSED", "UNUSED", 
+            "UNUSED", MENU_ENTRY_2);
+            break;
+        case 3:
+            drw_4_entry_menu("Credits", "UNUSED", "UNUSED", 
+            "UNUSED", MENU_ENTRY_3);
+            break;
+        case 4:
+            drw_4_entry_menu("Credits", "UNUSED", "UNUSED", 
+            "UNUSED", MENU_ENTRY_4);
+            break;
+    }
 }
 
 
@@ -86,7 +107,8 @@ void* syscalls[MAX_SYSCALLS] = {
     syscall_popc,
     reset_vga,
     display_disks,
-    vga_clear_color
+    vga_clear_color,
+    syscall_update_menuentry,
 };
 
 #endif

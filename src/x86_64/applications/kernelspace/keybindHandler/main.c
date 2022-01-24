@@ -11,13 +11,15 @@ void debug_putc();
 void _reset();
 void color_change(unsigned char);
 void kprint(char*);
+void update_entry(unsigned char);
+void _curs_move(int, int);
 // END
 
 
 void kb_isr();
 
-unsigned int cursor_x = 18;
-unsigned int cursor_y = 2;
+unsigned int cursor_x = 20;
+unsigned int cursor_y = 0;
 
 const unsigned char* const SC_ASCII = "\x00\x1B" "1234567890-=" "\x08"
 "\x00" "qwertyuiop[]" "\x0D\x1D" "asdfghjkl;'`" "\x00" "\\"
@@ -48,7 +50,8 @@ void kb_isr() {
 
     static special_keys_t curKey = NONE;
     static selections_t selected = NONE;
-
+    static unsigned char entryNum = 1;
+ 
     if (!(displaying)) {
         if (scancode == 29) {
             curKey = CTRL;
@@ -70,6 +73,14 @@ void kb_isr() {
             kprint("[R]ed, [G]reen, [P]urple");
             displaying = 1;
             selected = COLOR_SELECTOR;
+        } else if (scancode == 73 && entryNum < 4) {
+            ++entryNum; 
+            update_entry(entryNum);
+            _curs_move(cursor_x += 15, cursor_y);
+        } else if (scancode == 81 && entryNum > 1) {
+            --entryNum;
+            update_entry(entryNum); 
+            _curs_move(cursor_x -= 15, cursor_y);
         }
     }
 

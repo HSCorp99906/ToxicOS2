@@ -8,6 +8,7 @@ all:
 	gcc -c -m32 src/x86_64/kernel/drivers/impl/VGA.c -ffreestanding -fno-pie -fstack-protector -o obj/vga.o
 	gcc -c -m32 src/x86_64/kernel/util/impl/strings.c -ffreestanding -fno-pie -fstack-protector -o obj/strings.o
 	gcc -c -m32 src/x86_64/kernel/drivers/impl/floppy.c -ffreestanding -fno-pie -fstack-protector -o obj/floppy.o
+	gcc -c -m32 src/x86_64/kernel/drivers/impl/graphics.c -ffreestanding -fno-pie -fstack-protector -o obj/graphics.o
 	nasm -f elf32 src/x86_64/kernel/kernel.S -o obj/kasm.o
 	i686-elf-ld -m elf_i386 -T link.ld obj/*.o -o Toxic/boot/kernel.bin
 	grub-mkrescue -o ToxicOS.iso Toxic/

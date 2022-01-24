@@ -1,7 +1,7 @@
 global _syscall_dispatcher
 extern syscalls
 
-%define MAX_SYSCALLS 9
+%define MAX_SYSCALLS 10
 
 _syscall_dispatcher:
     cmp eax, MAX_SYSCALLS - 1

@@ -4,6 +4,8 @@ global debug_putc
 global _reset
 global color_change
 global kprint
+global update_entry
+global _curs_move
 
 destub_kb_isr:
     mov eax, 0x1
@@ -42,5 +44,18 @@ color_change:
 kprint:
     mov eax, 0x3
     mov ecx, [esp + 4]
+    int 0x80
+    ret
+
+update_entry:
+    mov eax, 0x9
+    mov ecx, [esp + 4]
+    int 0x80
+    ret
+
+_curs_move:
+    mov eax, 0x2
+    mov ecx, [esp + 4]
+    mov ebx, [esp + 8]
     int 0x80
     ret

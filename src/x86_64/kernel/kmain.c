@@ -6,11 +6,12 @@ char* vga_main = (char*)0xB8000;
 #include "drivers/VGA.h"
 #include "drivers/IO.h"
 #include "drivers/floppy.h"
+#include "drivers/PCI_IDE_ATA.h"
+#include "drivers/graphics.h"
 #include "interrupts/IDT.h"
 #include "interrupts/interrupt_handlers.h"
 #include "interrupts/syscalls/syscalls.h"
 #include "memory/GDT.h"
-#include "drivers/PCI_IDE_ATA.h"
 
 #define SW 80
 
@@ -38,7 +39,12 @@ int _start() {
     unmask_kb_irq();
     __asm__ __volatile__("sti"); 
  
-    vga_clear(&vga_main, 0x1, 0xE); 
+    vga_clear(&vga_main, 0x1, 0xE);
+    drw_4_entry_menu("Credits", "UNUSED", "UNUSED", 
+            "UNUSED", MENU_ENTRY_1);
+
+
+    update_cursor(20, 0);       // += 15 to advance to next entry.
 
     /*
     vga_puts("Drives Detected: ", &vga_main, 1);
@@ -47,9 +53,6 @@ int _start() {
 
     vga_main += 120;
     */
-
-    vga_puts("Kernel Initialized.", &vga_main, 1);
-    vga_puts("", &vga_main, 1);
 
     _ssmain();      // Run the kernel space startup shell.
 
