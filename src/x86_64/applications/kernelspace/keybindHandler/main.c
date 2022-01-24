@@ -13,6 +13,7 @@ void color_change(unsigned char);
 void kprint(char*);
 void update_entry(unsigned char);
 void _curs_move(int, int);
+void _clear_screen();
 // END
 
 
@@ -38,18 +39,12 @@ typedef enum {
 } special_keys_t;
 
 
-typedef enum {
-    COLOR_SELECTOR,
-} selections_t;
-
-
 void kb_isr() {
     unsigned short scancode = inportb(0x60);
     static unsigned char displaying = 0;
     char ch = SC_ASCII[scancode]; 
 
-    static special_keys_t curKey = NONE;
-    static selections_t selected = NONE;
+    static special_keys_t curKey = NONE; 
     static unsigned char entryNum = 1;
  
     if (!(displaying)) {
@@ -62,17 +57,13 @@ void kb_isr() {
         } else if (ch == 'f') {
             if (curKey == CTRL) {
                 curKey = NONE;
-                __asm__ __volatile__("mov $0x7, %eax; int $0x80");
                 displaying = 1;
+                __asm__ __volatile__("mov $0x7, %eax; int $0x80"); 
             }
         } else if (scancode == 42 && curKey == CTRL) {
             curKey = CTRL_SHIFT;
         } else if (curKey == CTRL_SHIFT && ch == 'r') {
             _reset();
-        } else if (curKey == CTRL_SHIFT && ch == 'c') {
-            kprint("[R]ed, [G]reen, [P]urple");
-            displaying = 1;
-            selected = COLOR_SELECTOR;
         } else if (scancode == 73 && entryNum < 4) {
             ++entryNum; 
             update_entry(entryNum);
@@ -81,22 +72,21 @@ void kb_isr() {
             --entryNum;
             update_entry(entryNum); 
             _curs_move(cursor_x -= 15, cursor_y);
+        } else if (scancode == 28) {
+            switch (entryNum) {
+                case 1:
+                    _clear_screen();
+                    kprint("This Operating System is made by Ian Moffett and the help of his cat, Kess.");
+                    displaying = 1;
+                    break;
+            }
         }
     }
 
     if (scancode == 1 && displaying) {
         __asm__ __volatile__("mov $0x6, %eax; int $0x80");
         displaying = 0;
-    } else if (selected == COLOR_SELECTOR && ch == 'r') {
-        color_change(0x01);   
-        selected = NONE;
-    } else if (selected == COLOR_SELECTOR && ch == 'g') {
-        color_change(0x02);
-        selected = NONE;
-    } else if (selected == COLOR_SELECTOR && ch == 'p') {
-        color_change(0x04);
-        selected = NONE;
-    }
+    } 
 
     send_pic_end_int();     // END OF INTERRUPT.
 }
