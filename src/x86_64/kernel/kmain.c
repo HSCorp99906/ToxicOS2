@@ -1,4 +1,5 @@
 #define _KERNEL_START
+#define NULL 0
 
 char* vga_main = (char*)0xB8000;
 
@@ -9,7 +10,6 @@ char* vga_main = (char*)0xB8000;
 #include "interrupts/interrupt_handlers.h"
 #include "interrupts/syscalls/syscalls.h"
 #include "memory/GDT.h"
-
 
 #define SW 80
 
@@ -36,7 +36,7 @@ int _start() {
     set_idt_desc32(0x80, _syscall_dispatcher, INT_GATE_FLAGS);  
     unmask_kb_irq();
     __asm__ __volatile__("sti"); 
-
+ 
     vga_clear(&vga_main, 0x1, 0xE); 
 
     /*

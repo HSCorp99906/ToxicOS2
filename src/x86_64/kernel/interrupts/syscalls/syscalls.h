@@ -1,7 +1,7 @@
 #ifndef SYSCALLS_H
 #define SYSCALLS_H
 
-#define MAX_SYSCALLS 8
+#define MAX_SYSCALLS 9
 
 #include "../../drivers/IO.h"
 #include "../../drivers/VGA.h"
@@ -56,6 +56,22 @@ void reset_vga() {
 }
 
 
+void vga_clear_color() {
+    const unsigned char RED = 0x01;
+    const unsigned char GREEN = 0x2;
+    const unsigned char PURPLE = 0x04;
+    register unsigned char flags asm("ecx");
+
+    if (flags & RED) {
+        vga_clear(&vga_main, 0x04, 0xE);
+    } else if (flags & GREEN) {
+        vga_clear(&vga_main, 0x02, 0xE);
+    } else if (flags & PURPLE) {
+        vga_clear(&vga_main, 0x01 | 0x04, 0xE);
+    }
+}
+
+
 void display_disks() {
     floppy_detect_drives();
 }
@@ -70,6 +86,7 @@ void* syscalls[MAX_SYSCALLS] = {
     syscall_popc,
     reset_vga,
     display_disks,
+    vga_clear_color
 };
 
 #endif

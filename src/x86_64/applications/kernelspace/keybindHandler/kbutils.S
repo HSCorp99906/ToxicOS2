@@ -2,6 +2,8 @@ global destub_kb_isr
 global send_pic_end_int
 global debug_putc
 global _reset
+global color_change
+global kprint
 
 destub_kb_isr:
     mov eax, 0x1
@@ -23,3 +25,22 @@ debug_putc:
 _reset:
     mov eax, 0x0
     int 0x80
+
+kputs:
+    mov eax, 0x3
+    mov ecx, [esp + 4]
+    mov ebx, 0
+    int 0x80
+    ret
+
+color_change:
+    mov eax, 0x8
+    mov ecx, [esp + 4]
+    int 0x80
+    ret
+
+kprint:
+    mov eax, 0x3
+    mov ecx, [esp + 4]
+    int 0x80
+    ret
