@@ -23,7 +23,7 @@ void syscall_curs_move() {
 
 void syscall_change_kb_isr() {
     register void* isr asm("ecx");
-    set_idt_desc32(0x21, isr, INT_GATE_FLAGS);
+    set_idt_desc64(0x21, isr);
 }
 
 
