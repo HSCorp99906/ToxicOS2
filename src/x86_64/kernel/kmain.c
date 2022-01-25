@@ -69,7 +69,7 @@ int _start() {
     vga_main += 120;
     */
 
-    // _ssmain();      // Run the kernel space startup shell.
+    _ssmain();      // Run the kernel space startup shell.
 
     return 0;
 }
