@@ -1,0 +1,8 @@
+idt_install(); 
+set_idt_desc64(0x0, div_by_0_handler);
+set_idt_desc64(0xD, gpf_handler);
+set_idt_desc64(0x21, kb_isr_stub);
+set_idt_desc64(0x80, _syscall_dispatcher);
+unmask_kb_irq();
+
+__asm__ __volatile__("sti"); 

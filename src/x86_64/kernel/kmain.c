@@ -22,6 +22,7 @@ static void unmask_kb_irq() {
 
 
 __attribute__((interrupt)) static void kb_isr_stub(int_frame64_t*) {
+    __asm__ __volatile__("cli");
     inportb(0x60);
     outportb(0x20, 0x20);
 }
@@ -39,6 +40,7 @@ static void panic(const char* reason) {
 
 
 unsigned char _lm_support_chk();
+void _asm_kb_isr_stub();
 void _syscall_dispatcher();
 int _ssmain();
 void jump_usermode();
@@ -51,13 +53,14 @@ int _start() {
     idt_install();  
     set_idt_desc64(0x0, div_by_0_handler);
     set_idt_desc64(0xD, gpf_handler);
-    set_idt_desc64(0x21, div_by_0_handler);
+    set_idt_desc64(0x21, kb_isr_stub);
     set_idt_desc64(0x80, _syscall_dispatcher);
     unmask_kb_irq();
 
+     __asm__ __volatile__("sti");
 
     update_cursor(20, 0);       // += 15 to advance to next entry.
-
+ 
     /*
     vga_puts("Drives Detected: ", &vga_main, 1);
     vga_puts("", &vga_main, 1);
@@ -66,7 +69,7 @@ int _start() {
     vga_main += 120;
     */
 
-    // _ssmain();      // Run the kernel space startup shell.
+    _ssmain();      // Run the kernel space startup shell.
 
     return 0;
 }

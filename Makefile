@@ -1,7 +1,10 @@
 all:
 	nasm -felf64 src/x86_64/kernel/interrupts/syscalls/syscall_dispatcher.S -o obj/sysc_disp.o
 	nasm -felf64 src/x86_64/applications/kernelspace/keybindHandler/kbutils.S -o obj/kbutils.o
-	nasm -felf64 src/x86_64/kernel/cpu/longMode.S -o obj/lm.o	
+	nasm -felf64 src/x86_64/kernel/cpu/longMode.S -o obj/lm.o
+	nasm -felf64 src/x86_64/kernel/interrupts/interrupt_handlers.S -o obj/asminthandlr.o
+	nasm -felf64 src/x86_64/kernel/interrupts/IDT.S -o obj/asmidt.o
+	gcc -c -m64 src/x86_64/kernel/memory/impl/pmm.c -o obj/pmm.o
 	gcc -c -m64 src/x86_64/kernel/kmain.c -mgeneral-regs-only -ffreestanding -fno-pie -fstack-protector -o obj/kmain.o
 	gcc -c -m64 src/x86_64/applications/kernelspace/keybindHandler/main.c  -ffreestanding -fno-pie -fstack-protector -o obj/startupShell.o
 	gcc -c -m64 src/x86_64/kernel/drivers/impl/IO.c -ffreestanding -fno-pie -fstack-protector -o obj/io.o
@@ -17,4 +20,4 @@ all:
 	grub-mkrescue -o ToxicOS.iso Toxic/
 	sudo dd bs=4M if=ToxicOS.iso of=/dev/sdb
 	rm ToxicOS.iso
-	sudo qemu-system-x86_64 -hdb /dev/sdb -monitor stdio 
+	sudo qemu-system-x86_64 -hdb /dev/sdb -d int -D logfile.txt -M smm=off -monitor stdio 

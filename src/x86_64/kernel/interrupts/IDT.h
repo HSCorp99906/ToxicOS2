@@ -35,6 +35,7 @@ typedef struct {
     uint8_t p : 1;              // Present.
     uint16_t isr_addr_middle;   // 64 bits means more bits dummy.
     uint32_t isr_addr_high;
+    uint32_t reserved2;         // This was it.
 } __attribute__((packed)) idt_entry64_t;
 
 
@@ -82,8 +83,12 @@ void set_idt_desc64(uint8_t entry, void* isr) {
     idt64[entry].p = 1;
     idt64[entry].attr = 0xF;
     idt64[entry].kernel_cs = 0x08;
+    idt64[entry].reserved = 0x0;
+    idt64[entry].reserved2 = 0x0;
 }
 
+
+void _lidt(idtr64_t*);
 
 void idt_install() {
     idtr64.limit = (uint16_t)(sizeof(idt_entry64_t) * 256);
@@ -107,7 +112,18 @@ void idt_install() {
     outportb(0x21,a1);              // Restore the masks.
     outportb(0xA1,a2);
 
-    __asm__ __volatile__("lidt %0" : : "memory"(idtr64)); 
+    for (int i = 0; i < 256; ++i) {
+        idt64[i].isr_addr_low = 0x0;
+        idt64[i].isr_addr_middle = 0x0;
+        idt64[i].isr_addr_high = 0x0;
+
+        idt64[i].dpl = 0x0;
+        idt64[i].p = 0x0;
+        idt64[i].attr = 0x0;
+        idt64[i].kernel_cs = 0x0;
+    }
+
+    _lidt(&idtr64);
 
 }  
 #endif
