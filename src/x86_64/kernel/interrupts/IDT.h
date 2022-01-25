@@ -1,7 +1,7 @@
-#ifndef IDT_H
-#define IDT_H
+#ifndef idt64_H
+#define idt64_H
 
-#define IDT_SIZE 256
+#define idt64_SIZE 256
 
 #define TRAP_GATE_FLAGS 0x8F
 #define INT_GATE_FLAGS 0x8E
@@ -27,32 +27,37 @@
 typedef struct {
     uint16_t isr_addr_low;
     uint16_t kernel_cs;         // Code segment where the ISR is.
-    uint8_t reserved;           // Reserved by intel for some reason.
-    uint8_t attr;
-    uint16_t isr_addr_high;
-} __attribute__((packed)) idt_entry32_t;
+    uint8_t ist : 3;            // Interrupt stack table. TODO: Research.
+    uint8_t reserved : 5;       // Reserved by intel for some reason.
+    uint8_t attr : 4;
+    uint8_t zero1 : 1;
+    uint8_t dpl : 2;            // Descriptor privellege level.
+    uint8_t p : 1;              // Present.
+    uint16_t isr_addr_middle;   // 64 bits means more bits dummy.
+    uint32_t isr_addr_high;
+} __attribute__((packed)) idt_entry64_t;
 
 
 /*
- *  IDTR describes where in memory
- *  the IDT is.
+ *  idt64R describes where in memory
+ *  the idt64 is.
  */
 
 typedef struct {
-    uint16_t limit;         // Max address of IDT.
-    uint32_t base;          // Lowest address of IDT.
-} __attribute__((packed)) idtr32_t;
+    uint16_t limit;         // Max address of idt64.
+    uint64_t base;          // Lowest address of idt64.
+} __attribute__((packed)) idtr64_t;
 
-idt_entry32_t idt32[IDT_SIZE];     // Actual IDT.
-idtr32_t idtr32;
+idt_entry64_t idt64[idt64_SIZE];     // Actual IDT.
+idtr64_t idtr64;
 
 typedef struct {
-    uint32_t eip;
-    uint32_t cs;
-    uint32_t eflags;
-    uint32_t sp;
-    uint32_t ss;
-} __attribute__((packed)) int_frame32_t;
+    uint64_t rip;
+    uint64_t cs;
+    uint64_t rflags;
+    uint64_t rsp;
+    uint64_t ss;
+} __attribute__((packed)) int_frame64_t;
 
 
 /*
@@ -61,24 +66,28 @@ typedef struct {
  */
 
 
-__attribute__((interrupt)) void default_int_handler(int_frame32_t* frame) {
+__attribute__((interrupt)) void default_int_handler(int_frame64_t* frame) {
     __asm__ __volatile__("cli; hlt");
 }
 
 
-void set_idt_desc32(uint8_t entry, void* isr, uint8_t flags) {
-    idt_entry32_t* descriptor = &idt32[entry];
-    descriptor->isr_addr_low = (uint32_t)isr & 0xFFFF;
-    descriptor->kernel_cs = 0x08;
-    descriptor->reserved = 0;
-    descriptor->attr = flags;
-    descriptor->isr_addr_high = ((uint32_t)isr >> 16) & 0xFFFF;
+void set_idt_desc64(uint8_t entry, void* isr) {
+    uint64_t addr = (uint64_t)isr;
+
+    idt64[entry].isr_addr_low = addr & 0xFFFF;
+    idt64[entry].isr_addr_middle = (addr & 0xFFFF0000) >> 16;
+    idt64[entry].isr_addr_high = (addr & 0xFFFFFFFF00000000) >> 32;
+
+    idt64[entry].dpl = 0;
+    idt64[entry].p = 1;
+    idt64[entry].attr = 0xF;
+    idt64[entry].kernel_cs = 0x08;
 }
 
 
 void idt_install() {
-    idtr32.limit = (uint16_t)(sizeof(idt_entry32_t) * 256);
-    idtr32.base = (uint32_t)&idt32; 
+    idtr64.limit = (uint16_t)(sizeof(idt_entry64_t) * 256);
+    idtr64.base = (uint64_t)&idt64; 
 
     unsigned char a1,a2;
     a1 = inportb(0x21);             // Get master mask.
@@ -98,7 +107,7 @@ void idt_install() {
     outportb(0x21,a1);              // Restore the masks.
     outportb(0xA1,a2);
 
-    __asm__ __volatile__("lidt %0" : : "memory"(idtr32)); 
+    __asm__ __volatile__("lidt %0" : : "memory"(idtr64)); 
 
 }  
 #endif

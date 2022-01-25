@@ -12,8 +12,7 @@ char* vga_main = (char*)0xB8000;
 #include "interrupts/IDT.h"
 #include "interrupts/interrupt_handlers.h"
 #include "interrupts/syscalls/syscalls.h"
-#include "memory/GDT.h"
-
+#include "interrupts/exceptions.h"
 
 #define SW 80
 
@@ -22,7 +21,7 @@ static void unmask_kb_irq() {
 }
 
 
-static void kb_isr_stub() {
+__attribute__((interrupt)) static void kb_isr_stub(int_frame64_t*) {
     inportb(0x60);
     outportb(0x20, 0x20);
 }
@@ -42,21 +41,19 @@ static void panic(const char* reason) {
 unsigned char _lm_support_chk();
 void _syscall_dispatcher();
 int _ssmain();
+void jump_usermode();
 
-int _start() {   
-    _gdt_install();
-    idt_install();
- 
-    set_idt_desc32(0x0, div_by_0_handler, TRAP_GATE_FLAGS);
-    set_idt_desc32(0x21, kb_isr_stub, INT_GATE_FLAGS);
-    set_idt_desc32(0x80, _syscall_dispatcher, INT_GATE_FLAGS);
-    unmask_kb_irq();
-
-    __asm__ __volatile__("sti"); 
- 
+int _start() {
     vga_clear(&vga_main, 0x1, 0xE);
     drw_4_entry_menu("Credits", "UNUSED", "UNUSED", 
             "UNUSED", MENU_ENTRY_1);
+    
+    idt_install();  
+    set_idt_desc64(0x0, div_by_0_handler);
+    set_idt_desc64(0xD, gpf_handler);
+    set_idt_desc64(0x21, div_by_0_handler);
+    set_idt_desc64(0x80, _syscall_dispatcher);
+    unmask_kb_irq();
 
 
     update_cursor(20, 0);       // += 15 to advance to next entry.
@@ -69,11 +66,7 @@ int _start() {
     vga_main += 120;
     */
 
-    if (!(_lm_support_chk())) {
-        panic("LONG MODE NOT SUPPORTED.");
-    }
-
-    _ssmain();      // Run the kernel space startup shell.
+    // _ssmain();      // Run the kernel space startup shell.
 
     return 0;
 }

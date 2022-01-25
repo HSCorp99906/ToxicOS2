@@ -11,13 +11,8 @@ section .text
     dd CHECKSUM
         
 global start
-extern _start     
+extern _start
+extern _lm_entry
 start:
     cli
-    call _start
-    jmp .post_exec
-
-.post_exec:
-    sti
-    hlt
-    jmp .post_exec
+    jmp _lm_entry 

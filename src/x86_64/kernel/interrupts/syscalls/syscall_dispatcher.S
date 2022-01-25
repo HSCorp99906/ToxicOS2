@@ -10,9 +10,7 @@ _syscall_dispatcher:
     cmp eax, 0
     jl .ignore
 
-    pusha
     call [syscalls + eax * 4]  ; Each entry is 4 bytes.
-    popa
 
     iretd
 
