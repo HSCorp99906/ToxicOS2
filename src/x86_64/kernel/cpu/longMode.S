@@ -132,6 +132,6 @@ long_man:   ; For long jump.
     jmp .post_exec
 
 .post_exec:
-    sti
+    ; sti
     hlt
     jmp .post_exec
