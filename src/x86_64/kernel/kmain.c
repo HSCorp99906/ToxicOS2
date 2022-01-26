@@ -13,6 +13,7 @@ char* vga_main = (char*)0xB8000;
 #include "interrupts/interrupt_handlers.h"
 #include "interrupts/syscalls/syscalls.h"
 #include "interrupts/exceptions.h"
+#include "memory/kmalloc.h"
 
 #define SW 80
 
@@ -45,11 +46,11 @@ void _syscall_dispatcher();
 int _ssmain();
 void jump_usermode();
 
-int _start() {
+int _start() { 
     vga_clear(&vga_main, 0x1, 0xE);
     drw_4_entry_menu("Credits", "UNUSED", "UNUSED", 
-            "UNUSED", MENU_ENTRY_1);
-    
+            "UNUSED", MENU_ENTRY_1); 
+
     idt_install();  
     set_idt_desc64(0x0, div_by_0_handler);
     set_idt_desc64(0xD, gpf_handler);
