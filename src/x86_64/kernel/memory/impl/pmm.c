@@ -1,9 +1,16 @@
 #include "../pmm.h"
 
+static size_t mem_used = 0;
+
+size_t frame_bytes_allocated() {
+    return mem_used;
+}
+
 
 static size_t _get_bit(const uintptr_t PHYS) {
     return (PHYS % (PGE_SZ * 8 * 4) / 4096);
 }
+
 
 static size_t _get_byte(const uintptr_t PHYS) {
     return PHYS / (PGE_SZ * 8 * 4);
@@ -16,7 +23,6 @@ void init_pmm(pmm_struct_t* pmm) {
     }
 }
 
-
 // Allocates 4 bytes.
 /*
  * FIXME: Idk if this is a problem, but if things
@@ -24,6 +30,7 @@ void init_pmm(pmm_struct_t* pmm) {
  * this might be the issue.
  */
 
+// 4 bytes will be allocated from this.
 uintptr_t alloc_frame(pmm_struct_t* pmm) { 
     for (int byte = 0; byte < BMP_SZ; ++byte) {
         uint32_t dword = pmm->bitmap[byte];
@@ -32,6 +39,7 @@ uintptr_t alloc_frame(pmm_struct_t* pmm) {
                 // Toggle the bit.
                 pmm->bitmap[byte] ^= (0x1 << bit);
                 // Return physical address.
+                mem_used += 4;
                 return 4096 * (8 * 4 * byte + bit);
             }
         }
@@ -40,5 +48,6 @@ uintptr_t alloc_frame(pmm_struct_t* pmm) {
 
 
 void free_frame(pmm_struct_t* pmm, const uintptr_t PHYS) {
+    mem_used -= 4;
     pmm->bitmap[_get_byte(PHYS)] |= (0x0 << _get_bit(PHYS));
 }

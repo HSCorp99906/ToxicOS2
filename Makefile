@@ -4,6 +4,9 @@ all:
 	nasm -felf64 src/x86_64/kernel/cpu/longMode.S -o obj/lm.o
 	nasm -felf64 src/x86_64/kernel/interrupts/interrupt_handlers.S -o obj/asminthandlr.o
 	nasm -felf64 src/x86_64/kernel/interrupts/IDT.S -o obj/asmidt.o
+	nasm -felf64 src/x86_64/kernel/memory/cr3.S -o obj/cr3.o
+	gcc -c -m64 src/x86_64/kernel/memory/impl/memset.c -ffreestanding -fno-pie -fstack-protector -o obj/memset.o
+	gcc -c -m64 src/x86_64/kernel/memory/impl/vmm.c -ffreestanding -fno-pie -fstack-protector -o obj/vmm.o
 	gcc -c -m64 src/x86_64/kernel/memory/impl/kmalloc.c -ffreestanding -fno-pie -fstack-protector -o obj/kmalloc.o
 	gcc -c -m64 src/x86_64/kernel/memory/impl/pmm.c -o obj/pmm.o
 	gcc -c -m64 src/x86_64/kernel/kmain.c -mgeneral-regs-only -ffreestanding -fno-pie -fstack-protector -o obj/kmain.o

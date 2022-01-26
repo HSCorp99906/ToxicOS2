@@ -14,8 +14,19 @@
 #define PAGE_SOFTWARE 1 << 9
 #define PAGE_NX 1 << 63
 
-#include <stddef.h>
 
+#define ID_OFFSET 1UL << 46
+#define ID_PAGE 0x8000
+#define L3P 0x7000
+#define L4P 0x6000
+
+
+#define HIGH(ADDR) (ADDR + ID_OFFSET)
+#define LOW(ADDR)  (ADDR - ID_OFFSET)
+
+#include <stddef.h>
+#include "memset.h"
+#include "pmm.h"
 
 void vmm_init();
 uint64_t create_address_space();

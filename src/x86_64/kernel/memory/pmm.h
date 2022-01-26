@@ -26,5 +26,5 @@ typedef struct {
 void init_pmm();
 uintptr_t alloc_frame();
 void free_frame();
-
+size_t frame_bytes_allocated();
 #endif
