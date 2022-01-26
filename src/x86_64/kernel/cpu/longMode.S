@@ -134,6 +134,9 @@ GDT64:                           ; Global Descriptor Table (64-bit).
 
 
 bits 64
+
+global enter_usr_mode
+
 long_man:   ; For long jump.
     mov ax, GDT64.Data
     mov ds, ax

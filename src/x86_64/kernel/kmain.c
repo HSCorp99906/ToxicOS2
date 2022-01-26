@@ -44,10 +44,10 @@ unsigned char _lm_support_chk();
 void _asm_kb_isr_stub();
 void _syscall_dispatcher();
 int _ssmain();
-void jump_usermode();
+
 
 int _start() {
-    heap_init((void*)0x500, 250);
+    heap_init((void*)0x500, 250); 
 
     vga_clear(&vga_main, 0x1, 0xE);
     drw_4_entry_menu("Credits", "UNUSED", "UNUSED", 

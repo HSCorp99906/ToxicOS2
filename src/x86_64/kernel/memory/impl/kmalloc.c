@@ -8,6 +8,7 @@ typedef struct _MEM_BLOCK {
     struct _MEM_BLOCK* next;
     size_t size;
     unsigned char flags;
+    void* rip;
 } __attribute__((packed)) mem_block_t;
 
 
@@ -49,6 +50,8 @@ void* _malloc(size_t size) {
         mem_tail = region;
         allocated += size;
     }
+
+    region->rip = __builtin_return_address(0);
 
     return DATA_START(region);
 }
