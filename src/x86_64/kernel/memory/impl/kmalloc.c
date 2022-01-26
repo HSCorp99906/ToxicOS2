@@ -33,9 +33,11 @@ static mem_block_t* first_fit(size_t size);
 
 void* _malloc(size_t size) {
     if (allocated + size > limit) {
+        // Oops! No memory.
         return NULL;
     }
-
+    
+    // We get a region that is free.
     mem_block_t* region = first_fit(size);
     if (region == NULL) {
         char* next = DATA_START(mem_tail) + mem_tail->size;
@@ -71,12 +73,16 @@ static mem_block_t* first_fit(size_t size) {
     mem_block_t* curFrame = mem_head;
 
     while (curFrame != NULL) {
+        // We check if the memory if big enough and is free.
         if (curFrame->flags & FLAG_FREE && curFrame->size >= size) {
+            // Return frame.
             return curFrame;
         }
 
+        // Get next frame.
         curFrame = curFrame->next;
     }
 
+    // No memory was found.
     return NULL;
 }
