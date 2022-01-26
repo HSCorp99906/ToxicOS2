@@ -17,6 +17,13 @@ void init_pmm(pmm_struct_t* pmm) {
 }
 
 
+// Allocates 4 bytes.
+/*
+ * FIXME: Idk if this is a problem, but if things
+ * start breaking and is related to memory,
+ * this might be the issue.
+ */
+
 uintptr_t alloc_frame(pmm_struct_t* pmm) { 
     for (int byte = 0; byte < BMP_SZ; ++byte) {
         uint32_t dword = pmm->bitmap[byte];
