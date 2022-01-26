@@ -46,7 +46,9 @@ void _syscall_dispatcher();
 int _ssmain();
 void jump_usermode();
 
-int _start() { 
+int _start() {
+    heap_init((void*)0x500, 250);
+
     vga_clear(&vga_main, 0x1, 0xE);
     drw_4_entry_menu("Credits", "UNUSED", "UNUSED", 
             "UNUSED", MENU_ENTRY_1); 
