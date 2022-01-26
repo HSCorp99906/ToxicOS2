@@ -14,6 +14,7 @@
 #define PAGE_SOFTWARE 1 << 9
 #define PAGE_NX 1 << 63
 
+#include <stddef.h>
 
 
 void vmm_init();

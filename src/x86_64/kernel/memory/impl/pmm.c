@@ -1,11 +1,11 @@
 #include "../pmm.h"
 
 
-static size_t get_bit(const uintptr_t PHYS) {
+static size_t _get_bit(const uintptr_t PHYS) {
     return (PHYS % (PGE_SZ * 8 * 4) / 4096);
 }
 
-static size_t get_byte(const uintptr_t PHYS) {
+static size_t _get_byte(const uintptr_t PHYS) {
     return PHYS / (PGE_SZ * 8 * 4);
 }
 
@@ -40,6 +40,5 @@ uintptr_t alloc_frame(pmm_struct_t* pmm) {
 
 
 void free_frame(pmm_struct_t* pmm, const uintptr_t PHYS) {
-    unsigned char bit = get_bit(PHYS);
-    pmm->bitmap[get_byte(PHYS)] |= (0x0 << get_bit(PHYS));
+    pmm->bitmap[_get_byte(PHYS)] |= (0x0 << _get_bit(PHYS));
 }
