@@ -16,9 +16,6 @@
 
 
 #define ID_OFFSET 1UL << 46
-#define ID_PAGE 0x8000
-#define L3P 0x7000
-#define L4P 0x6000
 
 
 #define HIGH(ADDR) (ADDR + ID_OFFSET)

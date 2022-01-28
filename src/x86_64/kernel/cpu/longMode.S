@@ -1,5 +1,6 @@
 global _lm_support_chk
 global _lm_entry
+global TSSDesc
 extern _start
 
 bits 32
@@ -22,7 +23,7 @@ _lm_entry:
     mov [edi], eax
     
     xor eax, eax
-    mov eax, 3 | (1 << 7)       ; Setting entry in l3 page table.
+    mov eax, 3 | (1 << 7) | (1 << 2)       ; Setting entry in l3 page table.
     mov [_l3_page_tbl], eax
  
     mov ebx, _l4_page_tbl
@@ -44,7 +45,7 @@ _lm_entry:
     or eax, (1 << 31) | 0x1
     mov cr0, eax
 
-    lgdt [GDT64.Pointer]
+    lgdt [Pointer]
     jmp GDT64.Code:long_man
 
 _lm_support_chk:
@@ -128,7 +129,11 @@ GDT64:                           ; Global Descriptor Table (64-bit).
     db 11110010b                 ; Access (read/write).
     db 00000000b                 ; Granularity.
     db 0                         ; Base (high).
-    .Pointer:                    ; The GDT-pointer.
+    TSSDesc:
+        dq 0
+        dq 0
+
+    Pointer:                    ; The GDT-pointer.
     dw $ - GDT64 - 1             ; Limit.
     dq GDT64                     ; Base.
 

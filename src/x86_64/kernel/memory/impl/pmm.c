@@ -21,6 +21,10 @@ void init_pmm(pmm_struct_t* pmm) {
     for (int i = 0; i < BMP_SZ; ++i) {
         pmm->bitmap[i] = 0;      // Null em.
     }
+
+    for (int i = 0; i < 32; ++i) {
+        pmm->bitmap[i] = ~0;
+    }
 }
 
 // Allocates 4 bytes.

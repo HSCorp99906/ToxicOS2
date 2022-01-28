@@ -14,6 +14,7 @@ char* vga_main = (char*)0xB8000;
 #include "interrupts/syscalls/syscalls.h"
 #include "interrupts/exceptions.h"
 #include "memory/kmalloc.h"
+#include "process/TSS.h"
 
 #define SW 80
 
@@ -44,10 +45,11 @@ unsigned char _lm_support_chk();
 void _asm_kb_isr_stub();
 void _syscall_dispatcher();
 int _ssmain();
-
+void vmm_init();
 
 int _start() {
-    heap_init((void*)0x500, 250); 
+    heap_init((void*)0x500, 500); 
+    vmm_init();
 
     vga_clear(&vga_main, 0x1, 0xE);
     drw_4_entry_menu("Credits", "UNUSED", "UNUSED", 
